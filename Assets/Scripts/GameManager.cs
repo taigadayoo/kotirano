@@ -4,77 +4,86 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    // Start is called before the first frame update
-
-    private static GameManager instance;
-    public GameObject grass;
+    private static GameManager instance; // シングルトンパターン用のインスタンス
+    public GameObject grass; // グラスオブジェクト
     [SerializeField]
-    GameObject qupid;
+    GameObject qupid; // キューピッドオブジェクト
 
-    public GameObject push;
-    GrassSpawn grassSpawn;
-   public GrassPower grassPower;
-    CountCollider countCollider;
-    Scenemanager scenemanager;
-    BoolManager boolManager;
-    public bool OnCount = false;
+    public GameObject push; // プッシュボタンオブジェクト
+    GrassSpawn grassSpawn; // GrassSpawnインスタンス
+    public GrassPower grassPower; // GrassPowerインスタンス
+    CountCollider countCollider; // CountColliderインスタンス
+    Scenemanager scenemanager; // SceneManagerインスタンス
+    BoolManager boolManager; // BoolManagerインスタンス
+    public bool OnCount = false; // カウント状態を管理
 
-    RamdomNumber ramdomNumber;
+    RamdomNumber ramdomNumber; // ランダム番号を管理するオブジェクト
 
-   
+    // Startメソッドはゲームオブジェクトが有効になったときに呼び出される
     void Start()
     {
-        StartCoroutine(TimeStop());
+        StartCoroutine(TimeStop()); // 時間を停止するコルーチンを開始
+        // 各種コンポーネントを取得
         grassSpawn = FindObjectOfType<GrassSpawn>();
         boolManager = FindObjectOfType<BoolManager>();
         countCollider = FindObjectOfType<CountCollider>();
         scenemanager = FindObjectOfType<Scenemanager>();
+
+        // BoolManagerのフラグを初期化
         boolManager.isJust = false;
         boolManager.isOver = false;
         boolManager.isStop = false;
-        
         boolManager.isRock = false;
         boolManager.isWine = false;
         boolManager.isCaktail = false;
 
+        // SceneManagerのフラグを初期化
         scenemanager.OneClear = false;
         scenemanager.OneFade = false;
     }
 
-    // Update is called once per frame
+    // Updateメソッドはフレームごとに呼び出される
     void Update()
     {
-       if(Input.GetKeyDown(KeyCode.Space) && Time.timeScale == 0)
+        // スペースキーが押された時に時間を再開
+        if (Input.GetKeyDown(KeyCode.Space) && Time.timeScale == 0)
         {
-            Time.timeScale = 1f;
-            push.SetActive(false);
+            Time.timeScale = 1f; // 時間を通常に戻す
+            push.SetActive(false); // プッシュボタンを非表示にする
         }
+
+        // GrassPowerを取得
         grassPower = FindFirstObjectByType<GrassPower>();
+
+        // グラスが存在する場合
         if (grass != null)
         {
-           
+            // グラスがキューピッドより右にあるかを判定
             if (grass.transform.position.x < qupid.transform.position.x)
             {
-                OnCount = true; //グラスがキューピッドより右にあるかを判定
+                OnCount = true; // カウントを有効にする
             }
             else
             {
-                OnCount = false;
+                OnCount = false; // カウントを無効にする
             }
+
+            // GrassPowerが終了したら判断を行う
             if (grassPower.Finish)
             {
-               
-                Judge();
+                Judge(); // 判定メソッドを呼び出す
             }
         }
     }
+
+    // 時間を停止するコルーチン
     IEnumerator TimeStop()
     {
-        yield return new WaitForSeconds(1f);
-      
-        Time.timeScale = 0;
+        yield return new WaitForSeconds(1f); // 1秒待機
+        Time.timeScale = 0; // 時間を停止
     }
-    public void Judge()
+
+public void Judge()
     {
         if(grassPower.grassName == GrassPower.GrassName.rock && grassPower.power == GrassPower.Power.one)
         {
